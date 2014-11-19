@@ -1,0 +1,2 @@
+
+echo "begin script"
