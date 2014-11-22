@@ -11,33 +11,32 @@ source('predictingFunctions.R')
 lastPressedKey<-"";
 predictWord<-""; 
 tbl<-list();
-
  
 # Define server logic required to summarize and view the selected
 # dataset
 shinyServer(function(input, output,session) {
+	
 
 
 
+	
+	#Write a message of "Loading data" while the data loads (use a hidden variable)
+	output$hidden  <- renderText({
 
-#Write a message of "Loading data" while the data loads
-  output$caption <- renderText({
+		# Create a Progress object
+		progress <- shiny::Progress$new()
+		progress$set(message = "Please, wait until the app is loaded", value = 0)
 
-    # Create a Progress object
-    progress <- shiny::Progress$new()
-    progress$set(message = "Please wait until the app is loaded", value = 0)
-    
-    #Load the n-grams (we do a global asignation using "<<-")
-    tbl<<-loadData();
+		#Load the n-grams (we do a global asignation using "<<-")
+		tbl<<-loadData();
 
-    # Close the progress when this reactive exits 
-    on.exit(progress$close())
-   
+		# Close the progress when this reactive exits 
+		on.exit(progress$close())
 
 
-  })
+	})
 
-  
+
 
 	#Do when a key is pressed
 	observe({
@@ -46,8 +45,6 @@ shinyServer(function(input, output,session) {
 		#Get the input word
 		theInput<-input$caption
 		lastPressedKey<-substring(theInput,nchar(theInput));
-
-
 
 		if (lastPressedKey==" "){
 			predictWord<-predict(theInput,tbl);
@@ -68,13 +65,11 @@ shinyServer(function(input, output,session) {
 
 
 		#Create the output
-		#theOutput<-paste (c(input$caption,predictWord), sep = " ");
 		isolate({
-			output$caption <- renderText({
-				theOutput;
-			})
-
+			output$predicted_sentence <- renderText({theOutput;})
 		})
+
+
 
 	})
 
