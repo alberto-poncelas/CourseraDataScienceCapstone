@@ -1,3 +1,11 @@
+########## CREATE 1 GRAMS #########
+
+echo "Obtaining all words..."
+cat all_clean | tr " " "\n" | sort | uniq --count > uniqueWords_tmp
+sort -rn uniqueWords_tmp > uniqueWords
+rm uniqueWords_tmp
+#remove first line (the one that counts whitespaces)
+sed -i 1d uniqueWords
 
 	
 ########## CREATE 2 GRAMS #########

@@ -4,6 +4,7 @@
 loadData <- function() {
   print("Loading data...");
   tbl=list()
+  tbl[[1]]<-read.table("data/uniqueWords");
   tbl[[2]]<-read.table("data/2grams");
   tbl[[3]]<-read.table("data/3grams");
   print("Data is loaded");
@@ -13,6 +14,9 @@ loadData <- function() {
 
 
 ######### PREDICTING FUNCTIONS ##########
+## There are two functions:
+## predictSingleWord:  Tries to predict the word given the first letters
+## predict: Tries to predict the next word in a sentence
 
 #Given a sentence obtains last n words
 getLastNWords<-function(sentence,n){
@@ -20,6 +24,40 @@ getLastNWords<-function(sentence,n){
 	return(sentenceV[(length(sentenceV)+1-n):length(sentenceV)]);
 }
 
+
+
+
+
+#Given sentence with the last word incompleted, tries to complet the last word of the sentence
+predictEndingWord<-function(sentence,tables=tbl){
+	table=tables[[1]];
+	
+	###check length of the sentence 
+	if ( sentence=="" || length(tables)==0){
+		return("");
+	}
+	sentenceLength<-length(strsplit(sentence, split=" ")[[1]])
+	if (sentenceLength==0){
+		return ("");
+	}
+
+	#Obtain first letters of the last word in a sentence
+	startChars<-getLastNWords(sentence,1);
+	lenStartChars<-nchar(startChars);
+
+	regex<-paste("^",startChars,sep="")
+	gram1Filt<-table[grep(regex, table[,2]), ]
+	if (dim(gram1Filt)[1]==0){
+		return("");
+	}else{
+		#get predicted word
+		predWord<-as.vector(gram1Filt[1,2])[1];
+		#complete the sentence with the predicted word
+		predSentence<-substr(sentence,0,nchar(sentence)-lenStartChars);
+		predSentence<-paste (c(predSentence,predWord), collapse = ""); 
+		return(predSentence);
+	}
+}
 
 
 

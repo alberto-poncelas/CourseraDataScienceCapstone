@@ -39,29 +39,44 @@ shinyServer(function(input, output,session) {
 
   
 
-  #Do when a key is pressed
-  observe({
+	#Do when a key is pressed
+	observe({
 
-      #Get the input word
-      theInput<-input$caption
-      lastPressedKey<-substring(theInput,nchar(theInput));
 
-      if (lastPressedKey==" "){
-        #predictWord<-"newWordprediction"
-        predictWord<-predict(theInput,tbl)
-      }else{
-        predictWord<-" "
-      }
-      
+		#Get the input word
+		theInput<-input$caption
+		lastPressedKey<-substring(theInput,nchar(theInput));
 
-      isolate({
-        output$caption <- renderText({
-          paste (c(input$caption,predictWord), sep = " ");
-        })
 
-      })
 
-  })
+		if (lastPressedKey==" "){
+			predictWord<-predict(theInput,tbl);
+			theOutput<-paste (c(input$caption,predictWord), sep = " ");
+		}else if (lastPressedKey=="_"){
+			#If the last pressed key is "_" then autocomplete the input
+			
+			#Remove last char "_"
+			theInput<-substr(theInput,0,nchar(theInput)-1);
+			theOutput<-predictEndingWord(theInput,tbl); 
+			updateTextInput(session, "caption",  value = theOutput);
+
+		}else{
+			theOutput<-predictEndingWord(theInput,tbl); 
+		}
+
+
+
+
+		#Create the output
+		#theOutput<-paste (c(input$caption,predictWord), sep = " ");
+		isolate({
+			output$caption <- renderText({
+				theOutput;
+			})
+
+		})
+
+	})
 
 
 
